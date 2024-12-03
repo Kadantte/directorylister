@@ -6,17 +6,12 @@ use App\Support\Str;
 
 class Url extends ViewFunction
 {
-    /** @var string The function name */
-    protected $name = 'url';
-
-    /** @var string The directory separator */
-    protected $directorySeparator;
+    protected string $name = 'url';
 
     /** Create a new Url object. */
-    public function __construct(string $directorySeparator = DIRECTORY_SEPARATOR)
-    {
-        $this->directorySeparator = $directorySeparator;
-    }
+    public function __construct(
+        private string $directorySeparator = DIRECTORY_SEPARATOR
+    ) {}
 
     /** Return the URL for a given path. */
     public function __invoke(string $path = '/'): string
@@ -27,7 +22,7 @@ class Url extends ViewFunction
     /** Strip all leading slashes (and a single dot) from a path. */
     protected function stripLeadingSlashes(string $path): string
     {
-        return preg_replace('/^\.?(\/|\\\)+/', '', $path);
+        return (string) preg_replace('/^\.?(\/|\\\)+/', '', $path);
     }
 
     /** Escape URL characters in path segments. */

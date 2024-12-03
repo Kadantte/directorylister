@@ -12,25 +12,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileInfoController
 {
-    /** @var Config The application configuration */
-    protected $config;
-
-    /** @var CacheInterface The application cache */
-    protected $cache;
-
-    /** @var TranslatorInterface Translator component */
-    protected $translator;
-
     /** Create a new FileInfoHandler object. */
     public function __construct(
-        Config $config,
-        CacheInterface $cache,
-        TranslatorInterface $translator
-    ) {
-        $this->config = $config;
-        $this->cache = $cache;
-        $this->translator = $translator;
-    }
+        private Config $config,
+        private CacheInterface $cache,
+        private TranslatorInterface $translator
+    ) {}
 
     /** Invoke the FileInfoHandler. */
     public function __invoke(Request $request, Response $response): ResponseInterface
@@ -38,7 +25,7 @@ class FileInfoController
         $path = $request->getQueryParams()['info'];
 
         $file = new SplFileInfo(
-            realpath($this->config->get('base_path') . '/' . $path)
+            (string) realpath($this->config->get('base_path') . '/' . $path)
         );
 
         if (! $file->isFile()) {
@@ -50,9 +37,9 @@ class FileInfoController
         }
 
         $response->getBody()->write($this->cache->get(
-            sprintf('file-info-%s', sha1($file->getRealPath())),
+            sprintf('file-info-%s', sha1((string) $file->getRealPath())),
             function () use ($file): string {
-                return json_encode(['hashes' => $this->calculateHashes($file)]);
+                return (string) json_encode(['hashes' => $this->calculateHashes($file)]);
             }
         ));
 
@@ -63,9 +50,9 @@ class FileInfoController
     protected function calculateHashes(SplFileInfo $file): array
     {
         return [
-            'md5' => hash_file('md5', $file->getRealPath()),
-            'sha1' => hash_file('sha1', $file->getRealPath()),
-            'sha256' => hash_file('sha256', $file->getRealPath()),
+            'md5' => hash_file('md5', (string) $file->getRealPath()),
+            'sha1' => hash_file('sha1', (string) $file->getRealPath()),
+            'sha256' => hash_file('sha256', (string) $file->getRealPath()),
         ];
     }
 }

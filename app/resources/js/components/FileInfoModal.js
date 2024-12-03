@@ -3,15 +3,15 @@ import axios from 'axios';
 export default () => ({
     error: null,
     filePath: 'file.info',
-    hashes: null,
+    hashes: {},
     visible: false,
 
     get title() {
-        return this.filePath.split('/').pop();
+        return decodeURI(this.filePath.split('/').pop());
     },
 
     get loading() {
-        return this.hashes === null;
+        return Object.keys(this.hashes).length === 0;
     },
 
     async show(filePath) {
@@ -30,7 +30,7 @@ export default () => ({
 
     hide() {
         this.visible = false;
-        this.hashes = null;
+        this.hashes = {};
         this.error = null;
     }
 });

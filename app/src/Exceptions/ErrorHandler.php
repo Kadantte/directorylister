@@ -12,18 +12,11 @@ use Throwable;
 
 class ErrorHandler implements ErrorHandlerInterface
 {
-    /** @var Twig Twig templating component */
-    protected $view;
-
-    /** @var TranslatorInterface Translation component */
-    protected $translator;
-
     /** Create a new ErrorHandler object. */
-    public function __construct(Twig $view, TranslatorInterface $translator)
-    {
-        $this->view = $view;
-        $this->translator = $translator;
-    }
+    public function __construct(
+        private Twig $view,
+        private TranslatorInterface $translator
+    ) {}
 
     /** Invoke the ErrorHandler class. */
     public function __invoke(
@@ -36,7 +29,7 @@ class ErrorHandler implements ErrorHandlerInterface
         $response = (new Response)->withStatus(500);
 
         if (in_array('application/json', explode(',', $request->getHeaderLine('Accept')))) {
-            $response->getBody()->write(json_encode([
+            $response->getBody()->write((string) json_encode([
                 'error' => ['message' => $this->translator->trans('error.unexpected')],
             ]));
 
